@@ -2,6 +2,8 @@
 
 from scapy.all import *
 import argparse
+import threading #thread module imported
+import time #time module
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -17,7 +19,35 @@ parser.add_argument("-f", "--file", type=argparse.FileType('r'), help = "File wi
 # Read arguments from command line
 args = parser.parse_args()
  
-print (args)
+#threads 
+
+def thread_delay(thread_name, delay, ip):
+	time.sleep(delay)
+
+	if args.source:
+		print("Diplaying source as: % s" % args.source)
+		ip_layer = IP(dst=ip, src=args.source)
+	else:
+		ip_layer = IP(dst=ip)
+
+	if args.protocol:
+		print("Diplaying protocol as: % s" % args.protocol)
+
+		layer = eval(args.protocol.upper() + "()")
+
+	else:
+		layer = ICMP()
+
+	packet = ip_layer / layer
+
+	if args.number:
+		send(packet, count=int(args.number))
+
+	else:
+		send(packet, loop=1)
+
+
+
 if args.ip:
 	print("Diplaying IP as: % s" % args.ip)
 
@@ -49,36 +79,20 @@ else:
 
 		#TODO transform the file to have an address in each line (Strip by space e.g)
 
-		#TODO do this with threads
-
 		#TODO argument validation 
 
+		count = 1;
 		# Strips the newline character 
 		for line in Lines: 
+			
 			print("Line:", line.strip())
 
-			if args.source:
-				print("Diplaying source as: % s" % args.source)
-				ip_layer = IP(dst=line.strip(), src=args.source)
-			else:
-				ip_layer = IP(dst=line.strip())
-
-			if args.protocol:
-				print("Diplaying protocol as: % s" % args.protocol)
-
-				layer = eval(args.protocol.upper() + "()")
-
-			else:
-				layer = ICMP()
-
-			packet = ip_layer / layer
-
-			if args.number:
-				send(packet, count=int(args.number))
-
-			else:
-				send(packet, loop=1)
-				
+			thread_n = threading.Thread(target=thread_delay, args=(count, 0, line.strip()))
+			thread_n.start()
+			count += 1
+		
+		#TODO work with the signal SIGINT
+		
 	
 		
 	else:
