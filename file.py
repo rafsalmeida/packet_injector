@@ -4,6 +4,9 @@ from scapy.all import *
 import argparse
 import threading #thread module imported
 import time #time module
+import os
+import ipaddress
+import sys
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -18,7 +21,7 @@ parser.add_argument("-f", "--file", type=argparse.FileType('r'), help = "File wi
 
 # Read arguments from command line
 args = parser.parse_args()
- 
+
 #threads 
 
 def thread_delay(thread_name, delay, ip):
@@ -48,8 +51,16 @@ def thread_delay(thread_name, delay, ip):
 
 
 
+
 if args.ip:
-	print("Diplaying IP as: % s" % args.ip)
+	try:
+		ip = ipaddress.ip_address(args.ip)
+		print('%s is a correct IP%s address.' % (ip, ip.version))
+	except:
+		print('Address/netmask is invalid: %s' % args.ip)
+		exit(1)
+
+	print("Destination: % s" % args.ip)
 
 	if args.source:
 		print("Diplaying source as: % s" % args.source)
@@ -75,24 +86,49 @@ if args.ip:
 
 else:
 	if args.file:
+		
 		Lines = args.file.readlines()
 
-		#TODO transform the file to have an address in each line (Strip by space e.g)
-
-		#TODO argument validation 
+		#argument validation 
+		for line in Lines:
+			if(line.strip() != ""):
+    				
+				try:
+					ip = ipaddress.ip_address(line.strip())
+					print('%s is a correct IP%s address.' % (ip, ip.version))
+				except:
+					print('Address/netmask is invalid: %s' % line)
+					exit(1)
+			
 
 		count = 1;
 		# Strips the newline character 
 		for line in Lines: 
 			
-			print("Line:", line.strip())
+			if(line.strip() != ""):
+				print("\nDestination:", line.strip())
 
-			thread_n = threading.Thread(target=thread_delay, args=(count, 0, line.strip()))
-			thread_n.start()
-			count += 1
+				thread_n = threading.Thread(target=thread_delay, args=(count, 0, line.strip()))
+				thread_n.start()
+				count += 1
 		
-		#TODO work with the signal SIGINT
-		
+		# End with CTRL + C
+		if args.number:
+			try:
+				time.sleep(0.5)
+			except (KeyboardInterrupt, SystemExit):
+				print("\n Terminating...")
+				os._exit(1)
+		else:
+			try:
+				print("\n Press CTRL+C to exit...")
+
+				while True:
+					time.sleep(0.5)
+			except (KeyboardInterrupt, SystemExit):
+				print("\n Terminating...")
+				os._exit(1)
+
 	
 		
 	else:
