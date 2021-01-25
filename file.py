@@ -43,7 +43,7 @@ def thread_delay(thread_name, delay, ip):
 
 
 	if args.number:
-		numPackets = args.number
+		numPackets = int(args.number)
 
 	else:
 		numPackets = N_PACKETS
@@ -162,7 +162,7 @@ if args.ip:
 
 
 	if args.number:
-		numPackets = args.number
+		numPackets = int(args.number)
 
 	else:
 		numPackets = N_PACKETS
