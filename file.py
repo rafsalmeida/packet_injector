@@ -50,7 +50,8 @@ def thread_delay(thread_name, delay, ip):
 	
 
 	if args.icmp:
- 		send(numPackets*(fragment(ip_layer/ICMP()/args.icmp*6000)))
+ 		p = fragment(ip_layer/ICMP()/(args.icmp*60000))
+		send(numPackets*p)
 
 
 	elif args.syn:
