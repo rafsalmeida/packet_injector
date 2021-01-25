@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser()
 # Adding optional argument
 parser.add_argument("-i", "--ip", help = "Destination IP Address")
 parser.add_argument("-s", "--source", help = "Source IP Address")
-parser.add_argument("--icmp", help = "ICMP Flood - message on the packet)
+parser.add_argument("--icmp", help = "ICMP Flood - message on the packet")
 parser.add_argument("--syn", help = "SYN Flood - message on the packet")
 parser.add_argument("--arp", help = "ARP Spoofing - Host IP Address")
 parser.add_argument("-n", "--number", help = "Number of packets")
