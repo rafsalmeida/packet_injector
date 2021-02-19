@@ -7,6 +7,7 @@ import time #time module
 import os
 import ipaddress
 import sys
+import json
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -24,12 +25,24 @@ parser.add_argument("-f", "--file", type=argparse.FileType('r'), help = "File wi
 # Read arguments from command line
 args = parser.parse_args() 
 
-"""
----------FUNCTIONS---------
-"""
+#Read json file
 
-N_THREADS = 5
-N_PACKETS = 50
+# Opening JSON file 
+f = open('config.json',) 
+  
+# returns JSON object as  
+# a dictionary 
+data = json.load(f) 
+  
+# Iterating through the json 
+# list 
+N_THREADS = data['n_threads']
+N_PACKETS = data['n_packets']
+
+  
+# Closing file 
+f.close()
+
 
 #threads
 def thread_delay(thread_name, delay, ip):
